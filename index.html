@@ -1,10 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Подарочек</title>
-  <script src="https://pygame-web.github.io/installer.js"></script>
+    <title>Подарочек - Игра</title>
+    <script src="https://cdn.jsdelivr.net/gh/pygame-web/pygame-web.github.io@main/installer.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #game-container {
+            margin: 20px 0;
+            border: 2px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #loading {
+            font-size: 20px;
+            margin: 20px;
+        }
+        #error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 500px;
+            display: none;
+        }
+        .instructions {
+            margin: 15px 0;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+    </style>
 </head>
 <body>
-  <pygame-web width="360" height="640" src="game.py"></pygame-web>
+    <h1>Подарочек - Игра</h1>
+    <div class="instructions">
+        <p>Игра для компании! Добавьте игроков, выберите задания и соревнуйтесь в выполнении задач.</p>
+    </div>
+    
+    <div id="game-container">
+        <pygame-web width="360" height="640" src="game.py" id="pygame-app"></pygame-web>
+    </div>
+    
+    <div id="loading">⏳ Загрузка игры... Это может занять 1-2 минуты</div>
+    <div id="error"></div>
+    
+    <div class="instructions">
+        <h3>Управление:</h3>
+        <p>• Для ПК: Используйте мышь</p>
+        <p>• Для телефонов: Касайтесь экрана</p>
+        <p>• Если игра не загружается, обновите страницу</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const app = document.getElementById('pygame-app');
+            
+            // Таймаут загрузки
+            const loadTimeout = setTimeout(() => {
+                if (!app.isLoaded) {
+                    error.innerHTML = `
+                        <h3>Ошибка загрузки</h3>
+                        <p>Попробуйте:</p>
+                        <ul>
+                            <li>Обновить страницу (Ctrl+F5)</li>
+                            <li>Использовать Chrome или Firefox</li>
+                            <li>Проверить интернет-соединение</li>
+                            <li>Отключить блокировщики рекламы</li>
+                        </ul>
+                        <p>Если проблема сохраняется, <a href="https://github.com/ваш-репозиторий/issues">сообщите об ошибке</a></p>
+                    `;
+                    error.style.display = 'block';
+                    loading.style.display = 'none';
+                }
+            }, 60000); // 60 секунд таймаут
+            
+            // Событие успешной загрузки
+            app.addEventListener('load', () => {
+                clearTimeout(loadTimeout);
+                loading.style.display = 'none';
+            });
+            
+            // Обработка ошибок
+            app.addEventListener('error', (e) => {
+                clearTimeout(loadTimeout);
+                loading.style.display = 'none';
+                error.innerHTML = `<strong>Ошибка:</strong> ${e.detail.message}`;
+                error.style.display = 'block';
+                console.error('Game error:', e.detail);
+            });
+        });
+    </script>
 </body>
 </html>
